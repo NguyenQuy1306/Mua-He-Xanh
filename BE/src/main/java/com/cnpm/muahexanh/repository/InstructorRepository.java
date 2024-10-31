@@ -17,6 +17,7 @@ public interface InstructorRepository extends JpaRepository<Instructor, Long> {
 
     Instructor findByPassword(String password);
 
-    @Query("SELECT SUM(c.price) FROM OrderItems c WHERE c.course.instructor.userId = ?1")
-    Long getTotalRevenue(Long instructorId);
+    // @Query("SELECT SUM(c.price) FROM OrderItems c WHERE
+    // c.course.instructor.userId = ?1")
+    // Long getTotalRevenue(Long instructorId);
 }
