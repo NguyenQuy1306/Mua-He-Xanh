@@ -123,7 +123,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         revokeAllUserRefreshTokens(user);
         saveUserToken(user, jwtToken);
         saveUserRefreshToken(user, refreshToken);
-
+        // Save cookie and send cookie to web user
         if (!(cookieService.addCookie(response,
                 "accessToken",
                 jwtToken).orElse(false)

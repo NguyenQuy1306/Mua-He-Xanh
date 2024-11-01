@@ -23,7 +23,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-    // @Value("${security.enabled}")
+    @Value("${security.enabled}")
     private boolean securityEnabled;
 
     private static final String[] WHITE_LIST_URL = {
@@ -49,7 +49,8 @@ public class SecurityConfig {
             "/api/password-reset/**",
             "/api/payment/vn-pay-callback",
             "/api/ratings/course/**",
-            "/api/ratings/course-rating/**"
+            "/api/ratings/course-rating/**",
+
     };
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;

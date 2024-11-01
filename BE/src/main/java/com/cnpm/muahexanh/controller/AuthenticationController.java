@@ -39,76 +39,55 @@ public class AuthenticationController {
     private final VerificationTokenService verificationTokenService;
     // private final CourseMapper courseMapper;
 
-    // @PostMapping("/register")
-    // public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody
-    // RegisterRequest request,
-    // BindingResult bindingResult) {
+    @PostMapping("/register")
+    public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody RegisterRequest request,
+            BindingResult bindingResult) {
 
-    // ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
-    // Map<String, String> errors = new HashMap<>();
-    // if (bindingResult.hasErrors()) {
-    // errors = bindingResult.getAllErrors().stream()
-    // .collect(Collectors.toMap(
-    // error -> ((FieldError) error).getField(),
-    // error -> error.getDefaultMessage()));
-    // apiResponse.error(errors);
-    // return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
-    // }
-    // try {
-    // if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-    // errors.put("message", "Email has already been used");
-    // apiResponse.error(errors);
-    // return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
-    // }
-    // // if
-    // (userRepository.findByPhoneNumber(request.getPhoneNumber()).isPresent()) {
-    // // errors.put("message", "Phone number has already been used");
-    // // apiResponse.error(errors);
-    // // return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
-    // // }
-    // if (userRepository.findByName(request.getName()).isPresent()) {
-    // errors.put("message", "Name has already been used");
-    // apiResponse.error(errors);
-    // return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
-    // }
-    // UserResponse userResponse = service.register(request);
-    // if (userResponse == null) {
-    // // System.out.println("---------LOI TAO USER--------------------");
-    // apiResponse.error(ResponseCode.getError(23));
-    // return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    // }
+        ApiResponse<UserResponse> apiResponse = new ApiResponse<>();
+        Map<String, String> errors = new HashMap<>();
+        if (bindingResult.hasErrors()) {
+            errors = bindingResult.getAllErrors().stream()
+                    .collect(Collectors.toMap(
+                            error -> ((FieldError) error).getField(),
+                            error -> error.getDefaultMessage()));
+            apiResponse.error(errors);
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        }
+        try {
+            // Check if the email or username already exists without sending verification
+            // emails
+            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+                errors.put("message", "Email has already been used");
+                apiResponse.error(errors);
+                return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+            }
+            if (userRepository.findByName(request.getName()).isPresent()) {
+                errors.put("message", "Name has already been used");
+                apiResponse.error(errors);
+                return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+            }
 
-    // boolean emailSent = false;
-    // String successMessage = "";
+            // Register the user without email verification
+            UserResponse userResponse = service.register(request);
+            if (userResponse == null) {
+                apiResponse.error(ResponseCode.getError(23));
+                return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
 
-    // if ("S".equals(request.getUserRole())) {
-    // emailSent = emailService.sendEmailToStudent(request.getEmail());
-    // // successMessage = "Registration successful. Please check your email to
-    // // complete account verification.";
-    // } else if ("I".equals(request.getUserRole())) {
-    // emailSent = emailService.sendEmailToInstructor(request.getEmail());
-    // // successMessage = "Registration successful. Please check your email to
-    // // complete account verification.";
-    // }
+            // Directly return success response
+            apiResponse.ok(userResponse);
+            return new ResponseEntity<>(apiResponse, HttpStatus.OK);
 
-    // if (emailSent) {
-    // apiResponse.ok(userResponse);
-    // return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-    // } else {
-    // errors.put("message", "Email has already been used");
-    // apiResponse.error(errors);
-    // return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    // }
-    // } catch (IllegalArgumentException i) {
-    // Map<String, String> error = new HashMap<>();
-    // error.put("message", "Invalid user role");
-    // apiResponse.error(error);
-    // return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
-    // } catch (Exception e) {
-    // apiResponse.error(ResponseCode.getError(23));
-    // return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
-    // }
-    // }
+        } catch (IllegalArgumentException i) {
+            Map<String, String> error = new HashMap<>();
+            error.put("message", "Invalid user role");
+            apiResponse.error(error);
+            return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            apiResponse.error(ResponseCode.getError(23));
+            return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @PostMapping("/authenticate")
     public ResponseEntity<ApiResponse<LoginResponse>> authenticate(
@@ -133,10 +112,7 @@ public class AuthenticationController {
             apiResponse.error(ResponseCode.getError(9));
             return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
         }
-        // catch (InactivatedUserException e) {
-        // errors.put("message", "Account is inactivated");
-        // return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
-        // }
+
     }
 
     @PostMapping("/refresh-token")
@@ -189,26 +165,14 @@ public class AuthenticationController {
     // return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     // }
 
-    // @GetMapping("/successful")
-    // public ResponseEntity<String> successfulAuthentication() {
-    // return ResponseEntity.status(HttpStatus.OK).body("Successful
-    // authentication");
-    // }
-    //
-    // @GetMapping("/unsuccessful")
-    // public ResponseEntity<String> unsuccessfulAuthentication() {
-    // return ResponseEntity.status(HttpStatus.OK).body("Unsuccessful
-    // authentication");
-    // }
+    @GetMapping("/successful")
+    public ResponseEntity<String> successfulAuthentication() {
+        return ResponseEntity.status(HttpStatus.OK).body("Successful authentication");
+    }
 
-    // @GetMapping("/testCResponse/{id}")
-    // public ResponseEntity<ApiResponse<CourseSearchResponse>>
-    // testCResponse(@PathVariable Long id) {
-    // ApiResponse<CourseSearchResponse> apiResponse = new ApiResponse<>();
-    // CourseSearchResponse courseSearchResponse = new CourseSearchResponse();
-    // Course course = courseRepository.findById(id).orElse(null);
-    // courseSearchResponse = courseMapper.toCourseSearchResponse(course);
-    // apiResponse.ok(courseSearchResponse);
-    // return new ResponseEntity<>(apiResponse, HttpStatus.OK);
-    // }
+    @GetMapping("/unsuccessful")
+    public ResponseEntity<String> unsuccessfulAuthentication() {
+        return ResponseEntity.status(HttpStatus.OK).body("Unsuccessful authentication");
+    }
+
 }

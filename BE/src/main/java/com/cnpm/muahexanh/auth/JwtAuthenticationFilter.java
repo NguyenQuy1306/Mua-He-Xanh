@@ -39,11 +39,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
+        // Nếu request đến các endpoint của hệ thống xác thực (ví dụ: đăng nhập, đăng
+        // ký),
+        // nó sẽ cho phép qua mà không cần xác thực.
         if (request.getServletPath().contains("/api/v1/auth")) {
             filterChain.doFilter(request, response);
             return;
         }
 
+        // đoạn code bị comment là vào cookie kiểm trả xem có 2 token accessToken và
+        // refreshToken hay không.
+        // Nếu cả 2 đều null thì đá qua filter DAO
         // String accessToken = cookieServiceImpl
         // .getCookie(request, "accessToken")
         // .orElse("null");
