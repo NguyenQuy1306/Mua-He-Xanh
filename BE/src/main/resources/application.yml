@@ -1,20 +1,17 @@
-#spring:
-#  boot:
-#    admin:
-#      client:
-#        url: http://localhost:8761/
-#
-#logging:
-#  file:
-#    name: curcus-log.log
-#    max-history: 20
-#    max-size: 20MB
-#
-#management:
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
-#  endpoint:
-#    health:
-#      show-details: always
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5433/SummerGreen
+    username: user
+    password: pass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+      database: postgresql
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+
+
+
+#Test
+secert.jwt.string : E978AF5875411FD33FE319AF8EB22
